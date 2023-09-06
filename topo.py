@@ -43,25 +43,9 @@ def topology():
     RS .cmd("ifconfig RS-eth0 up")
     LS .cmd("ifconfig LS-eth0 up")
 
-
     h1 .cmd("ip route add default via 192.168.1.254")
     RS .cmd("ip route add default via 11.0.0.254")
     LS .cmd("ip route add default via 10.0.0.254")
-
-    #RS .cmd("ip route add 192.168.1.0/24 via 192.168.1.254")
-    #LS .cmd("ip route add 192.168.1.0/24 via 192.168.1.254")
-
-    #mec.cmd("ip route add 11.0.0.0/24    dev mec-eth1")
-    #mec.cmd("ip route add 10.0.0.0/24    dev mec-eth2")
-    #mec.cmd("ip route add 192.168.1.0/24 dev mec-eth0")
-
-    ##testing 
-    # mec.cmd("ip route add 11.0.0.1/24 via 11.0.0.3")
-    # mec.cmd("ip route add 10.0.0.0/24 via 10.0.0.3")
-    # LS .cmd("ip route add 192.168.1.1 via 192.168.1.254")
-    # RS .cmd("ip route add 192.168.1.1 via 192.168.1.254")
-
-    # rule : mec.cmd("ip route add dst via next")
 
     CLI(net)
     net.stop()

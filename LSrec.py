@@ -1,18 +1,17 @@
-import socket
+from scapy.all import *
 import netfilterqueue
 import os
-from scapy.all import IP, Raw 
-import hashlib
-
-LS_IP = "10.0.0.3"
-RS_IP = "11.0.0.3"
 
 
-def packetParse(payload):
-    data = payload.get_payload()
+def packetParse(packet):
+
+    data = packet.get_payload()
     pkt = IP(data)
-
+    #Detail information
+    print(pkt.show())
+    #print(pkt[Raw].load.decode())
     if IP in pkt:
+
         DST_IP = pkt[IP].dst
         SRC_IP = pkt[IP].src
 
@@ -28,19 +27,25 @@ def packetParse(payload):
 
         print("=" * 40)
 
-    payload.accept()
+    packet.accept()
+
+# def allowOrNotAllow():
+#     if packet == "goodpkt":
+#         allow = 1
+#     else 
+#         allow = 0
+#     return pkt
 
 def main():
     os.system('iptables -A INPUT -j NFQUEUE --queue-num 0')
- 
 
-    queue0 = netfilterqueue.NetfilterQueue()
-    queue0.bind(0, packetParse)
+    queue = netfilterqueue.NetfilterQueue()
+    queue.bind(0, packetParse)
 
     try:
-        queue0.run()  # Main loop
+        queue.run()  # Main loop
     except KeyboardInterrupt:
-        queue0.unbind()  # server to server concat
+        queue.unbind()  # server to server concat
         # Rule delete
         os.system('iptables -D INPUT -j NFQUEUE --queue-num 0')
 
