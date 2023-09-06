@@ -4,9 +4,13 @@ import random
 def synPacket(sourcePorts,target):
     sourcePort = random.choice(sourcePorts)
     print(sourcePort)
-    socket = socket.socket(socket.AF_INET,socket.SOCK_STRAM)
-    socket.settimeout(4)
-    socket.connect(target)
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    try:
+        s.connect(target)
+    except:
+        s.close()
+        
+
 
 def synFlooding(targetIP,targetPort):
     try:

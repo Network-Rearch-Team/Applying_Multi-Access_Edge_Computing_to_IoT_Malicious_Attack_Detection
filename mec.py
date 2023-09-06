@@ -30,8 +30,8 @@ def packetParse(payload):
     print("Receive Packet info:")
     print(pkt.summary())
    
-
-    if IP in pkt and pkt[IP].dst == '12.0.0.4':
+   
+    if IP in pkt:
 
         DST_IP = pkt[IP].dst
         SRC_IP = pkt[IP].src
@@ -41,30 +41,43 @@ def packetParse(payload):
         # print packet payload
 
         payload_data=""
-        if Raw in pkt:
+
+        print("Send to LS to Analysis Packet")
+        #pkt[IP].dst = LS_IP
+        ip_packet = IP(src=SRC_IP, dst=LS_IP) / TCP(dport=DST_PORT)
+
+
+        if Raw in pkt and pkt[IP].dst == '12.0.0.4':
+
             payload_data = pkt[Raw].load.decode('utf-8')
             print("Payload Data:", payload_data)
 
            
             print("Send to LS to Analysis Packet")
-            pkt[IP].dst = LS_IP
             payload_dataLS = payload_data + "allow:" + str(allow)
             ip_packet = IP(src=SRC_IP, dst=LS_IP) / TCP(dport=DST_PORT) / Raw(load=payload_dataLS)
+
+            # allow = 1
+
+            # if allow == 1:
+            #     print("Send to RS")
+            #     payload_dataRS = payload_data + "allow:" + str(allow) + "\n" +"Meow:Hacker"
+            #     ip_packet = IP(src=SRC_IP, dst=DST_IP) / TCP(dport=DST_PORT) / Raw(load=payload_dataRS)
+            #     send(ip_packet)
+
+            print("Raw")
             send(ip_packet)
-
-            allow = 1
-
-            if allow == 1:
-                print("Send to RS")
-                payload_dataRS = payload_data + "allow:" + str(allow) + "\n" +"Meow:Hacker"
-                ip_packet = IP(src=SRC_IP, dst=DST_IP) / TCP(dport=DST_PORT) / Raw(load=payload_dataRS)
+            print("=" * 40)
+            payload.accept()
+        else:
+            if pkt[IP].dst == '12.0.0.4':
+                print("Send to LS to Analysis Packet")
                 send(ip_packet)
-            
-        print("=" * 40)
-        payload.drop()
+                print("=" * 40)
+            payload.accept()
+      
     else:
-        payload.drop()
-
+        print(1)
     # if allow == 1
     #     payload.accept()
     # else 
@@ -92,8 +105,8 @@ def main():
     try:
         queue1.run()  # Main loop for queue 1
     except KeyboardInterrupt:
-        queue1.unbind()
         os.system('iptables -D FORWARD -j NFQUEUE --queue-num 1')
+        queue1.unbind()
 
 if __name__ == "__main__":
     main()
